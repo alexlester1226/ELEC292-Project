@@ -32,26 +32,25 @@ with h5py.File("data.h5", "w") as hdf:
     train_group = segmented_data_group.create_group("Train")
     test_group = segmented_data_group.create_group("Test")
 
+    # string labels used in CSV file labeling
     names = ["Alex", "George", "Jayaram"]
     types = ["Face", "FP", "Hand"]
 
+    # for loop add Raw CSV Data to groups
     for i in range(0, len(names)):
-        group = hdf[f'Raw data/{names[i]}']
+        group = hdf[f'Raw data/{names[i]}']  # locate specific group
+
 
         for k in range(0, len(types)):
             name = f'{names[i]}.{types[k]}'
 
+            # get walking and jumping data and convert it using ".to_numpy()"
             walk_data = pd.read_csv(f'Raw Data/{names[i]}/{name}.Walking.csv').to_numpy()
             jump_data = pd.read_csv(f'Raw Data/{names[i]}/{name}.Jumping.csv').to_numpy()
 
+            # creating datasets with the converted csv data
             group.create_dataset(f'{name}.Walking', data=walk_data)
             group.create_dataset(f'{name}.Jumping', data=jump_data)
-
-
-
-
-
-print("HDF5 file created successfully with the specified structure.")
 
 
 
