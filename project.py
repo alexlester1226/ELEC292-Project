@@ -10,10 +10,6 @@ import numpy as np
 import h5py
 
 
-data = pd.read_csv('./Raw Data/Alex/Alex.FP.Walking.csv')
-print(data)
-
-
 # create hdf5 file
 with h5py.File("data.h5", "w") as hdf:
 
@@ -23,24 +19,37 @@ with h5py.File("data.h5", "w") as hdf:
     segmented_data_group = hdf.create_group("Segmented data")
 
     # Create subgroups under Raw data
-    raw_data_group.create_group("Alex Lester")
-    raw_data_group.create_group("George Choueiry")
-    raw_data_group.create_group("Jayaram Jeyakanthan")
+    raw_data_group.create_group("Alex")
+    raw_data_group.create_group("George")
+    raw_data_group.create_group("Jayaram")
 
     # Create subgroups under Pre-processed data
-    pre_processed_group.create_group("Alex Lester")
-    pre_processed_group.create_group("George Choueiry")
-    pre_processed_group.create_group("Jayaram Jeyakanthan")
+    pre_processed_group.create_group("Alex")
+    pre_processed_group.create_group("George")
+    pre_processed_group.create_group("Jayaram")
 
     # Create subgroups under Segmented data
     train_group = segmented_data_group.create_group("Train")
     test_group = segmented_data_group.create_group("Test")
 
+    names = ["Alex", "George", "Jayaram"]
+    types = ["Face", "FP", "Hand"]
+
+    for i in range(0, len(names)):
+        group = hdf[f'Raw data/{names[i]}']
+
+        for k in range(0, len(types)):
+            name = f'{names[i]}.{types[k]}'
+
+            walk_data = pd.read_csv(f'Raw Data/{names[i]}/{name}.Walking.csv').to_numpy()
+            jump_data = pd.read_csv(f'Raw Data/{names[i]}/{name}.Jumping.csv').to_numpy()
+
+            group.create_dataset(f'{name}.Walking', data=walk_data)
+            group.create_dataset(f'{name}.Jumping', data=jump_data)
 
 
 
-    # Example of writing a dataset
-    train_group.create_dataset("sample_dataset", data=[1, 2, 3, 4, 5])
+
 
 print("HDF5 file created successfully with the specified structure.")
 
