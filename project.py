@@ -7,6 +7,7 @@
 # import statements
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import h5py
 
 
@@ -40,7 +41,6 @@ with h5py.File("data.h5", "w") as hdf:
     for i in range(0, len(names)):
         group = hdf[f'Raw data/{names[i]}']  # locate specific group
 
-
         for k in range(0, len(types)):
             name = f'{names[i]}.{types[k]}'
 
@@ -54,3 +54,61 @@ with h5py.File("data.h5", "w") as hdf:
 
 
 
+
+# Line graph for x, y, z acceleration
+df = pd.read_csv('Raw Data/Alex/Alex.FP.Walking.csv')
+
+fig, ax = plt.subplots(figsize=(12, 6), layout='constrained')
+
+ax.plot(df['Linear Acceleration x (m/s^2)'], label='X-axis')
+ax.plot(df['Linear Acceleration y (m/s^2)'], label='Y-axis')
+ax.plot(df['Linear Acceleration z (m/s^2)'], label='Z-axis')
+
+ax.set_title('Accelerometer Data - Alex FP Walking')
+ax.set_xlabel('Sample Number (Time Index)')
+ax.set_ylabel('Acceleration (m/s²)')
+ax.legend()
+plt.show()
+
+df = pd.read_csv('Raw Data/Alex/Alex.FP.Jumping.csv')
+
+fig, ax = plt.subplots(figsize=(12, 6), layout='constrained')
+
+ax.plot(df['Linear Acceleration x (m/s^2)'], label='X-axis')
+ax.plot(df['Linear Acceleration y (m/s^2)'], label='Y-axis')
+ax.plot(df['Linear Acceleration z (m/s^2)'], label='Z-axis')
+
+ax.set_title('Accelerometer Data - Alex FP Jumping')
+ax.set_xlabel('Sample Number (Time Index)')
+ax.set_ylabel('Acceleration (m/s²)')
+ax.legend()
+plt.show()
+
+
+# Line graph for x, y, z acceleration
+df = pd.read_csv('Raw Data/Alex/Alex.FP.Walking.csv')
+
+fig, ax = plt.subplots(figsize=(12, 6), layout='constrained')
+
+ax.plot(df['Absolute acceleration (m/s^2)'], label='X-axis')
+
+
+ax.set_title('Accelerometer Data - Alex FP Walking')
+ax.set_xlabel('Sample Number (Time Index)')
+ax.set_ylabel('Acceleration (m/s²)')
+ax.legend()
+plt.show()
+
+# Line graph for x, y, z acceleration
+df = pd.read_csv('Raw Data/Alex/Alex.FP.Jumping.csv')
+
+fig, ax = plt.subplots(figsize=(12, 6), layout='constrained')
+
+ax.plot(df['Absolute acceleration (m/s^2)'], label='X-axis')
+
+
+ax.set_title('Accelerometer Data - Alex FP Jumping')
+ax.set_xlabel('Sample Number (Time Index)')
+ax.set_ylabel('Acceleration (m/s²)')
+ax.legend()
+plt.show()
