@@ -14,10 +14,8 @@ import h5py
 # Function to preprocess data
 def preprocess_data(df, activity_label):
 
-    # Rename columns for convenience (adjust based on actual headers)
-    df.rename(columns=lambda x: x.strip(), inplace=True)
 
-    # ===== 1. Handle Missing Data =====
+
     # Interpolate to fill missing values (NaNs)
     df.interpolate(method='linear', inplace=True)
 
@@ -45,7 +43,9 @@ def preprocess_data(df, activity_label):
     axs[1].set_title('Filtered Acceleration (MA filter)')
     axs[1].legend()
 
-    plt.xlabel('Sample Index')
+    plt.xlabel('Time [ms]')
+    plt.ylabel('Acceleration [m/s^2]')
+
     plt.tight_layout()
     plt.show()
 
@@ -73,7 +73,6 @@ with h5py.File("data.h5", "w") as hdf:
     types = ["Face", "FP", "Hand"]
     type_data = ["Raw data", "Pre-processed data"]
 
-
     for i in range(0, len(names)):
         for k in range(0, len(types)):
             group_raw = hdf[f'Raw data/{names[i]}']
@@ -90,3 +89,7 @@ with h5py.File("data.h5", "w") as hdf:
 
             group_process.create_dataset(f'{name}.Walking', data=process_walk_data.to_numpy())
             group_process.create_dataset(f'{name}.Jumping', data=process_jump_data.to_numpy())
+
+
+
+
