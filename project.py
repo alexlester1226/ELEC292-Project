@@ -12,9 +12,7 @@ import h5py
 
 
 # Function to preprocess data
-def preprocess_data(filepath, activity_label):
-    # Load the raw data
-    df = pd.read_csv(filepath)
+def preprocess_data(df, activity_label):
 
     # Rename columns for convenience (adjust based on actual headers)
     df.rename(columns=lambda x: x.strip(), inplace=True)
@@ -33,6 +31,7 @@ def preprocess_data(filepath, activity_label):
     # ===== 3. Plot Before and After Filtering =====
     fig, axs = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
     fig.suptitle(f'{activity_label} - Raw vs Filtered Accelerometer Data')
+
 
     axs[0].plot(df['Linear Acceleration x (m/s^2)'], label='Raw X')
     axs[0].plot(df['Linear Acceleration y (m/s^2)'], label='Raw Y')
@@ -76,22 +75,18 @@ with h5py.File("data.h5", "w") as hdf:
 
 
     for i in range(0, len(names)):
-        group = hdf[f'Raw data/{names[i]}']
         for k in range(0, len(types)):
+            group_raw = hdf[f'Raw data/{names[i]}']
+            group_process = hdf[f'Pre-processed data/{names[i]}']
             name = f'{names[i]}.{types[k]}'
-            walk_data = pd.read_csv(f'Raw Data/{names[i]}/{name}.Walking.csv').to_numpy()
-            jump_data = pd.read_csv(f'Raw Data/{names[i]}/{name}.Jumping.csv').to_numpy()
-            group.create_dataset(f'{name}.Walking', data=walk_data)
-            group.create_dataset(f'{name}.Jumping', data=jump_data)
 
-    for i in range(0, len(names)):
-        group = hdf[f'Pre-processed data/{names[i]}']
-        for k in range(0, len(types)):
-            name = f'{names[i]}.{types[k]}'
-            # call preprocessing data function
-            df_walk = preprocess_data(f'Pre-processed data/{names[i]}/{name}.Walking.csv', f'{name[i]} {types[k]} Walking')
-            df_jump = preprocess_data(f'Pre-processed data/{names[i]}/{name}.Jumping.csv', f'{name[i]} {types[k]} Jumping')
+            raw_walk_data = pd.read_csv(f'Raw Data/{names[i]}/{name}.Walking.csv')
+            raw_jump_data = pd.read_csv(f'Raw Data/{names[i]}/{name}.Jumping.csv')
+            process_walk_data = preprocess_data(raw_walk_data, f'{names[i]} {types[k]} Walking')
+            process_jump_data = preprocess_data(raw_jump_data, f'{names[i]} {types[k]} Jumping')
 
-            group.create_dataset(f'{name}.Walking', data=df_walk)
-            group.create_dataset(f'{name}.Jumping', data=df_jump)
+            group_raw.create_dataset(f'{name}.Walking', data=raw_walk_data.to_numpy())
+            group_raw.create_dataset(f'{name}.Jumping', data=raw_jump_data.to_numpy())
 
+            group_process.create_dataset(f'{name}.Walking', data=process_walk_data.to_numpy())
+            group_process.create_dataset(f'{name}.Jumping', data=process_jump_data.to_numpy())
