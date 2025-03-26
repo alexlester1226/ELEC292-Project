@@ -14,8 +14,6 @@ import h5py
 # Function to preprocess data
 def preprocess_data(df, activity_label):
 
-
-
     # Interpolate to fill missing values (NaNs)
     df.interpolate(method='linear', inplace=True)
 
@@ -89,6 +87,8 @@ with h5py.File("data.h5", "w") as hdf:
 
             group_process.create_dataset(f'{name}.Walking', data=process_walk_data.to_numpy())
             group_process.create_dataset(f'{name}.Jumping', data=process_jump_data.to_numpy())
+
+
 
 
 
