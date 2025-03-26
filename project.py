@@ -11,44 +11,6 @@ import matplotlib.pyplot as plt
 import h5py
 
 
-# ===============================
-# STEP 1–3: Data Storage (same as before)
-# ===============================
-
-# create hdf5 file
-with h5py.File("data.h5", "w") as hdf:
-    raw_data_group = hdf.create_group("Raw data")
-    pre_processed_group = hdf.create_group("Pre-processed data")
-    segmented_data_group = hdf.create_group("Segmented data")
-
-    raw_data_group.create_group("Alex")
-    raw_data_group.create_group("George")
-    raw_data_group.create_group("Jayaram")
-
-    pre_processed_group.create_group("Alex")
-    pre_processed_group.create_group("George")
-    pre_processed_group.create_group("Jayaram")
-
-    train_group = segmented_data_group.create_group("Train")
-    test_group = segmented_data_group.create_group("Test")
-
-    names = ["Alex", "George", "Jayaram"]
-    types = ["Face", "FP", "Hand"]
-
-    for i in range(len(names)):
-        group = hdf[f'Raw data/{names[i]}']
-        for k in range(len(types)):
-            name = f'{names[i]}.{types[k]}'
-            walk_data = pd.read_csv(f'Raw Data/{names[i]}/{name}.Walking.csv').to_numpy()
-            jump_data = pd.read_csv(f'Raw Data/{names[i]}/{name}.Jumping.csv').to_numpy()
-            group.create_dataset(f'{name}.Walking', data=walk_data)
-            group.create_dataset(f'{name}.Jumping', data=jump_data)
-
-
-# ===============================
-# STEP 4: PRE-PROCESSING
-# ===============================
-
 # Function to preprocess data
 def preprocess_data(filepath, activity_label):
     # Load the raw data
@@ -91,14 +53,45 @@ def preprocess_data(filepath, activity_label):
     return df
 
 
-# ===============================
-# EXAMPLE CALLS: Preprocess and Plot
-# ===============================
+# create hdf5 file
+with h5py.File("data.h5", "w") as hdf:
+    raw_data_group = hdf.create_group("Raw data")
+    pre_processed_group = hdf.create_group("Pre-processed data")
+    segmented_data_group = hdf.create_group("Segmented data")
 
-# Alex - FP - Walking
-walk_path = 'Raw Data/Alex/Alex.FP.Walking.csv'
-df_walk = preprocess_data(walk_path, 'Alex FP Walking')
+    raw_data_group.create_group("Alex")
+    raw_data_group.create_group("George")
+    raw_data_group.create_group("Jayaram")
 
-# Alex - FP - Jumping
-jump_path = 'Raw Data/Alex/Alex.FP.Jumping.csv'
-df_jump = preprocess_data(jump_path, 'Alex FP Jumping')
+    pre_processed_group.create_group("Alex")
+    pre_processed_group.create_group("George")
+    pre_processed_group.create_group("Jayaram")
+
+    train_group = segmented_data_group.create_group("Train")
+    test_group = segmented_data_group.create_group("Test")
+
+    names = ["Alex", "George", "Jayaram"]
+    types = ["Face", "FP", "Hand"]
+    type_data = ["Raw data", "Pre-processed data"]
+
+
+    for i in range(0, len(names)):
+        group = hdf[f'Raw data/{names[i]}']
+        for k in range(0, len(types)):
+            name = f'{names[i]}.{types[k]}'
+            walk_data = pd.read_csv(f'Raw Data/{names[i]}/{name}.Walking.csv').to_numpy()
+            jump_data = pd.read_csv(f'Raw Data/{names[i]}/{name}.Jumping.csv').to_numpy()
+            group.create_dataset(f'{name}.Walking', data=walk_data)
+            group.create_dataset(f'{name}.Jumping', data=jump_data)
+
+    for i in range(0, len(names)):
+        group = hdf[f'Pre-processed data/{names[i]}']
+        for k in range(0, len(types)):
+            name = f'{names[i]}.{types[k]}'
+            # call preprocessing data function
+            df_walk = preprocess_data(f'Pre-processed data/{names[i]}/{name}.Walking.csv', f'{name[i]} {types[k]} Walking')
+            df_jump = preprocess_data(f'Pre-processed data/{names[i]}/{name}.Jumping.csv', f'{name[i]} {types[k]} Jumping')
+
+            group.create_dataset(f'{name}.Walking', data=df_walk)
+            group.create_dataset(f'{name}.Jumping', data=df_jump)
+
