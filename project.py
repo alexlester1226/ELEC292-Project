@@ -207,9 +207,8 @@ def extract_features(df, samples_per_window=500):
     return np.array(features)
 
 
-def normalize_features(features):
-    scaler = StandardScaler()
-    return scaler.fit_transform(features), scaler
+def normalize_features(features, scaler):
+    return scaler.fit_transform(features)
 
 
 def create_hdf5_file():
@@ -257,7 +256,9 @@ def create_hdf5_file():
                 features_jump = extract_features(process_jump_data)
 
                 features_combined = np.vstack((features_walk, features_jump))
-                features_normalized, _ = normalize_features(features_combined)
+
+                scaler = StandardScaler()
+                features_normalized = normalize_features(features_combined, scaler)
 
                 labels_walk = np.zeros(len(features_walk))
                 labels_jump = np.ones(len(features_jump))
