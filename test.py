@@ -49,41 +49,61 @@ def extract_features(df, samples_per_window=500):
 def normalize_features(features, scaler):
     return scaler.fit_transform(features)
 
+# Function to train and evaluate the model
 def train_and_evaluate_model():
+    # Lists to store training and testing data from all users/sensors
     X_train_list, y_train_list = [], []
     X_test_list, y_test_list = [], []
+
+    # Open the HDF5 file and access training and testing datasets
     with h5py.File("data.h5", "r") as hdf:
         train_group = hdf["Segmented data/Train"]
         test_group = hdf["Segmented data/Test"]
+
+        # Collect training data and labels from all subgroups
         for key in train_group:
             if key.endswith(".X"):
                 name = key[:-2]
                 X_train_list.append(train_group[key][:])
                 y_train_list.append(train_group[f"{name}.y"][:])
+
+        # Collect testing data and labels from all subgroups
         for key in test_group:
             if key.endswith(".X"):
                 name = key[:-2]
                 X_test_list.append(test_group[key][:])
                 y_test_list.append(test_group[f"{name}.y"][:])
+
+    # Combine data from all users/sensors into single training and testing sets
     X_train = np.vstack(X_train_list)
     y_train = np.concatenate(y_train_list)
     X_test = np.vstack(X_test_list)
     y_test = np.concatenate(y_test_list)
+
+    # Train the logistic regression model
     model = LogisticRegression(max_iter=1000)
     model.fit(X_train, y_train)
+
+    # Predict class labels and probabilities on the test set
     y_pred = model.predict(X_test)
     y_prob = model.predict_proba(X_test)[:, 1]
+
+    # Evaluate performance metrics
     acc = accuracy_score(y_test, y_pred)
     prec = precision_score(y_test, y_pred)
     rec = recall_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
     auc = roc_auc_score(y_test, y_prob)
     conf_mat = confusion_matrix(y_test, y_pred)
+
+    # Print the evaluation results
     print(f"Accuracy: {acc:.3f}")
     print(f"Precision: {prec:.3f}")
     print(f"Recall: {rec:.3f}")
     print(f"F1 Score: {f1:.3f}")
     print(f"AUC: {auc:.3f}")
+
+    # Plot the confusion matrix
     plt.figure(figsize=(6, 4))
     sns.heatmap(conf_mat, annot=True, fmt="d", cmap="Blues", xticklabels=["Walking", "Jumping"], yticklabels=["Walking", "Jumping"])
     plt.title("Confusion Matrix")
@@ -91,6 +111,8 @@ def train_and_evaluate_model():
     plt.ylabel("Actual")
     plt.tight_layout()
     plt.show()
+
+    # Plot the ROC curve
     fpr, tpr, _ = roc_curve(y_test, y_prob)
     plt.figure(figsize=(6, 4))
     plt.plot(fpr, tpr, label=f"AUC = {auc:.2f}")
@@ -101,6 +123,8 @@ def train_and_evaluate_model():
     plt.legend()
     plt.tight_layout()
     plt.show()
+
+    # Save the trained model to a file for future use
     joblib.dump(model, "logistic_model.pkl")
 
 def predict_from_csv(input_path, output_path, window_size=500):
@@ -202,7 +226,7 @@ def create_hdf5_file():
                 hdf["Segmented data/Test"].create_dataset(f'{name}.y', data=y_test)
 
                 # call function to graph raw and processed data
-                # graph_data(process_walk_data, process_jump_data, f'{names[i]} {types[k]}')
+                graph_data(process_walk_data, process_jump_data, f'{names[i]} {types[k]}')
 
 def xyz_raw_filtered_graph(df, activity_label):
     # PLOT 1: X, Y, Z Raw vs Filtered (Separate Plots)
