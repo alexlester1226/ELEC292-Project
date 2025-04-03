@@ -108,6 +108,11 @@ def train_and_evaluate_model():
     X_test = np.vstack(X_test_list)
     y_test = np.concatenate(y_test_list)
 
+    # Shuffle training data
+    perm = np.random.permutation(len(X_train))
+    X_train = X_train[perm]
+    y_train = y_train[perm]
+
     # Create and train a pipeline: scaling + logistic regression
     clf = make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000))
     clf.fit(X_train, y_train)
@@ -253,7 +258,7 @@ def create_hdf5_file():
                 hdf["Segmented data/Test"].create_dataset(f'{name}.y', data=y_test)
 
                 # call function to graph raw and processed data
-                # graph_data(process_walk_data, process_jump_data, f'{names[i]} {types[k]}')
+                graph_data(process_walk_data, process_jump_data, f'{names[i]} {types[k]}')
 
 
 def xyz_raw_filtered_graph(df, activity_label):
@@ -272,7 +277,7 @@ def xyz_raw_filtered_graph(df, activity_label):
     axs[1].plot(df['x_filtered'], label='Filtered X')
     axs[1].plot(df['y_filtered'], label='Filtered Y')
     axs[1].plot(df['z_filtered'], label='Filtered Z')
-    axs[1].set_title('Filtered Acceleration (MA filter)')
+    axs[1].set_title('Filtered Acceleration (SMA filter)')
     axs[1].legend()
 
     plt.xlabel('Time [s x 10^-2]')
@@ -292,7 +297,7 @@ def absolute_raw_filtered_graph(df, activity_label):
 
     # Bottom: Filtered absolute acceleration
     axs[1].plot(df['Absolute_filtered'], label='Filtered Absolute Acceleration')
-    axs[1].set_title('Filtered Absolute Acceleration (MA Filter)')
+    axs[1].set_title('Filtered Absolute Acceleration (SMA Filter)')
     axs[1].set_xlabel('Time [s x 10^-2]')
     axs[1].set_ylabel('Acceleration [m/s²]')
     axs[1].legend()
@@ -397,9 +402,10 @@ def app():
 
 # main function
 if __name__ == '__main__':
-    # create_hdf5_file()
+    create_hdf5_file()
     # train_and_evaluate_model()
-    app()
+    # Note: run app function not when running training model function
+    # app()
 
 
 
