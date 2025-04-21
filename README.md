@@ -4,7 +4,7 @@ This project is a machine learning pipeline designed to classify human activitie
 
 ## 📁 Project Structure
 
-├── Raw Data/
+##├── Raw Data/
 │   ├── Alex/
 │   │   ├── Alex.Face.Walking.csv
 │   │   ├── Alex.Face.Jumping.csv
